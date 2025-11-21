@@ -13,7 +13,7 @@ public class Filme {
     private String titulo;
     private String sinopse;
     private String dataLancamento;
-    private float notaMedia;
+    private Float notaMedia;
 
     public Filme() {
     };
@@ -23,7 +23,7 @@ public class Filme {
         String titulo,
         String sinopse,
         String dataLancamento,
-        float notaMedia
+        Float notaMedia
     ) {
         this.id = id;
         this.titulo = titulo;
@@ -65,11 +65,11 @@ public class Filme {
         this.dataLancamento = dataLancamento;
     }
 
-    public float getNotaMedia() {
+    public Float getNotaMedia() {
         return notaMedia;
     }
 
-    public void setNotaMedia(float notaMedia) {
+    public void setNotaMedia(Float notaMedia) {
         this.notaMedia = notaMedia;
     }
 
@@ -80,8 +80,8 @@ public class Filme {
                 "id=" + id +
                 ", titulo='" + titulo + '\'' +
                 ", sinopse='" + sinopse + '\'' +
-                ", data_lancamento='" + dataLancamento + '\'' +
-                ", nota_media='" + notaMedia + '\'' +
+                ", dataLancamento='" + dataLancamento + '\'' +
+                ", notaMedia='" + notaMedia + '\'' +
                 '}';
     }
 }
