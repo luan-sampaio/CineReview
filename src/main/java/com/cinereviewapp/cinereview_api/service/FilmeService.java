@@ -10,6 +10,7 @@ import com.cinereviewapp.cinereview_api.model.Filme;
 @Service
 public class FilmeService {
     public List<Filme> filmes = new ArrayList<>();
+    private Long contadorId = 1L;
 
     // Retornar todos os filmes
     public List<Filme> getFilmes() {
@@ -18,6 +19,7 @@ public class FilmeService {
 
     // Adicionar filme
     public void addFilme(Filme filme) {
+        filme.setId(contadorId++);
         filmes.add(filme);
     }
 
