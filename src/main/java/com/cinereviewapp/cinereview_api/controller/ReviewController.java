@@ -17,7 +17,7 @@ public class ReviewController {
     private ReviewService reviewService;
     @PostMapping("/filmes/{filmeId}/reviews")
     public ResponseEntity<String> addReviewParaFilme(
-            @PathVariable Long filmeId,
+            @PathVariable String filmeId,
             @RequestBody Review review
     ) {
         boolean sucesso = reviewService.addReview(filmeId, review);
@@ -33,7 +33,7 @@ public class ReviewController {
     private FilmeService filmeService;
 
     @GetMapping("/filmes/{filmeId}/reviews")
-    public ResponseEntity<List<Review>> listarReviewsDoFilme(@PathVariable Long filmeId) {
+    public ResponseEntity<List<Review>> listarReviewsDoFilme(@PathVariable String filmeId) {
         if (filmeService.getFilmePorId(filmeId) == null) {
             return ResponseEntity.notFound().build();
         }

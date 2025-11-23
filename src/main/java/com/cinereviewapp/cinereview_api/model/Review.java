@@ -10,7 +10,7 @@ public class Review {
     @Id
     @GeneratedValue(strategy=GenerationType.IDENTITY)
     private Long usuarioId;
-    private Long filmeId;
+    private String filmeId;
     private float notaReview;
     private String comentario;
 
@@ -20,7 +20,7 @@ public class Review {
 
     public Review(
         Long usuarioId,
-        Long filmeId,
+        String filmeId,
         float notaReview,
         String comentario
     ) {
@@ -39,11 +39,11 @@ public class Review {
         this.usuarioId = usuarioId;
     }
 
-    public Long getFilmeId() {
+    public String getFilmeId() {
         return filmeId;
     }
 
-    public void setFilmeId(Long filmeId) {
+    public void setFilmeId(String filmeId) {
         this.filmeId = filmeId;
     }
 

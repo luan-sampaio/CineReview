@@ -18,7 +18,7 @@ public class ReviewService {
         this.filmeService = filmeService;
     }
 
-    public boolean addReview(Long filmeId, Review review) {
+    public boolean addReview(String filmeId, Review review) {
         Filme filmeExistente = filmeService.getFilmePorId(filmeId);
 
         if (filmeExistente != null) {
@@ -31,7 +31,7 @@ public class ReviewService {
         }
     }
 
-    public List<Review> getReviewsPorFilmeId(Long filmeId) {
+    public List<Review> getReviewsPorFilmeId(String filmeId) {
         return reviews.stream()
                 .filter(review -> review.getFilmeId().equals(filmeId))
                 .toList();
