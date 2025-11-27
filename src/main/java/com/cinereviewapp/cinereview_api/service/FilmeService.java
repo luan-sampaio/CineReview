@@ -9,6 +9,8 @@ import org.springframework.stereotype.Service;
 
 import com.cinereviewapp.cinereview_api.model.Filme;
 import com.cinereviewapp.cinereview_api.repository.FilmeRepository;
+import com.cinereviewapp.cinereview_api.exception.ResourceNotFoundException;
+
 
 @Service
 public class FilmeService {
@@ -52,6 +54,7 @@ public class FilmeService {
         filme.setSinopse(filmeDetalhes.getSinopse());
         filme.setNotaMedia(filmeDetalhes.getNotaMedia());
         filme.setDataLancamento(filmeDetalhes.getDataLancamento());
+        return filmeRepository.save(filme);
     }
 
     // Testar
