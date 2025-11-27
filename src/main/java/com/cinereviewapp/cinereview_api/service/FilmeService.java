@@ -1,42 +1,62 @@
 package com.cinereviewapp.cinereview_api.service;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.cinereviewapp.cinereview_api.model.Filme;
+import com.cinereviewapp.cinereview_api.repository.FilmeRepository;
 
 @Service
 public class FilmeService {
-    public List<Filme> filmes = new ArrayList<>();
+    
+    private final FilmeRepository filmeRepository;
+
+    @Autowired
+    public FilmeService(FilmeRepository filmeRepository) {
+        this.filmeRepository = filmeRepository;
+    }
 
     // Retornar todos os filmes
     public List<Filme> getFilmes() {
-        return filmes;
+        return filmeRepository.findAll();
     }
 
     // Adicionar filme
     public void addFilme(Filme filme) {
         var id = UUID.randomUUID().toString();
         filme.setId(id);
-        filmes.add(filme);
+        filmeRepository.save(filme);
     }
 
     // Filtrar por id
-    public Filme getFilmePorId(String id) {
-        return filmes.stream()
-        .filter(filme -> filme.getId().equals(id))
-        .findFirst()
-        .orElse(null);
+    public Optional<Filme> getFilmePorId(String id) {
+        return filmeRepository.findById(id);
     }
 
+    // TESTAR ISSO AQUI
     // Filtrar por nome de filme
-    public Filme getFilmePorNome(String titulo) {
-        return filmes.stream()
-        .filter(filme -> filme.getTitulo().equals(titulo))
-        .findFirst()
-        .orElse(null);
+    public Optional<Filme> getFilmePorNome(String titulo) {
+        return filmeRepository.findById(titulo);
+    }
+
+    // Testar
+    // Método para alterar um filme
+    public Filme updateFilme(String titulo, Filme filmeDetalhes) {
+        Filme filme = filmeRepository.findById(titulo)
+                    .orElseThrow(() -> new ResourceNotFoundException("Filme não encontrado com titulo " + titulo));
+        filme.setTitulo(filmeDetalhes.getTitulo());
+        filme.setSinopse(filmeDetalhes.getSinopse());
+        filme.setNotaMedia(filmeDetalhes.getNotaMedia());
+        filme.setDataLancamento(filmeDetalhes.getDataLancamento());
+    }
+
+    // Testar
+    // Deletar um filme
+    public void deleteFilme(String titulo) {
+        filmeRepository.deleteById(titulo);
     }
 }
