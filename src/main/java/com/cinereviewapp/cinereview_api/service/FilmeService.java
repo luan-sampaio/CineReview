@@ -7,9 +7,9 @@ import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.cinereviewapp.cinereview_api.exception.ResourceNotFoundException;
 import com.cinereviewapp.cinereview_api.model.Filme;
 import com.cinereviewapp.cinereview_api.repository.FilmeRepository;
-import com.cinereviewapp.cinereview_api.exception.ResourceNotFoundException;
 
 
 @Service
@@ -28,10 +28,10 @@ public class FilmeService {
     }
 
     // Adicionar filme
-    public void addFilme(Filme filme) {
+    public Filme addFilme(Filme filme) {
         var id = UUID.randomUUID().toString();
         filme.setId(id);
-        filmeRepository.save(filme);
+        return filmeRepository.save(filme);
     }
 
     // Filtrar por id

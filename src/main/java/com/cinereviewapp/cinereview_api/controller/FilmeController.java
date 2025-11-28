@@ -28,7 +28,7 @@ public class FilmeController {
     }
     
     @GetMapping("/filme/{titulo}")
-    public Filme getFilmePorTitulo(@PathVariable String titulo) {
+    public ResponseEntity<Filme> getFilmePorTitulo(@PathVariable String titulo) {
         Filme filme = filmeService.getFilmePorNome(titulo)
                     .orElseThrow(() -> new ResourceNotFoundException("Filme não encontrado com título " + titulo));
         return ResponseEntity.ok(filme);

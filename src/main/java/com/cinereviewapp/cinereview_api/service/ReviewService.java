@@ -2,10 +2,12 @@ package com.cinereviewapp.cinereview_api.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+
+import org.springframework.stereotype.Service;
 
 import com.cinereviewapp.cinereview_api.model.Filme;
 import com.cinereviewapp.cinereview_api.model.Review;
-import org.springframework.stereotype.Service;
 
 @Service
 public class ReviewService {
@@ -19,7 +21,7 @@ public class ReviewService {
     }
 
     public boolean addReview(String filmeId, Review review) {
-        Filme filmeExistente = filmeService.getFilmePorId(filmeId);
+        Optional<Filme> filmeExistente = filmeService.getFilmePorId(filmeId);
 
         if (filmeExistente != null) {
             review.setFilmeId(filmeId);
