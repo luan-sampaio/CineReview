@@ -1,14 +1,11 @@
 package com.cinereviewapp.cinereview_api.model;
 
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 
 @Entity
 public class Review {
     @Id
-    @GeneratedValue(strategy=GenerationType.IDENTITY)
     private Long usuarioId;
     private String filmeId;
     private float notaReview;
