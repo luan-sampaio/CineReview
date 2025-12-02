@@ -3,6 +3,7 @@ package com.cinereviewapp.cinereview_api.controller;
 import java.net.FileNameMap;
 import java.util.List;
 
+import com.cinereviewapp.cinereview_api.service.ReviewService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +17,7 @@ import com.cinereviewapp.cinereview_api.exception.ResourceNotFoundException;
 public class FilmeController {
     
     private FilmeService filmeService;
+    private ReviewService reviewService;
 
     @Autowired
     public FilmeController(FilmeService filmeService) {
@@ -47,7 +49,21 @@ public class FilmeController {
 
     @DeleteMapping("/filme/{titulo}")
     public ResponseEntity<Void> deleteFilme(@PathVariable String titulo) {
-        filmeService.deleteFilme(titulo);
-        return ResponseEntity.noContent().build();
+        // Primeiro precisamos descobrir o ID desse filme antes de deletar
+        var filmeOpt = filmeService.getFilmePorNome(titulo);
+
+        if (filmeOpt.isPresent()) {
+            String filmeId = filmeOpt.get().getId();
+
+            // 1. Deleta as reviews da memória
+            reviewService.deleteReviewsPorFilmeId(filmeId);
+
+            // 2. Deleta o filme do banco
+            filmeService.deleteFilme(titulo);
+
+            return ResponseEntity.noContent().build();
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 }

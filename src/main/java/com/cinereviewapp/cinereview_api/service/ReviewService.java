@@ -38,4 +38,20 @@ public class ReviewService {
                 .filter(review -> review.getFilmeId().equals(filmeId))
                 .toList();
     }
+
+
+    public List<Review> getReviewsPorTituloFilme(String tituloFilme) {
+        Optional<Filme> filme = filmeService.getFilmePorNome(tituloFilme);
+
+        if (filme.isPresent()) {
+            String idDoFilme = filme.get().getId();
+            return getReviewsPorFilmeId(idDoFilme);
+        } else {
+            return List.of();
+        }
+    }
+    // Remove todas as reviews associadas a um ID de filme
+    public void deleteReviewsPorFilmeId(String filmeId) {
+        reviews.removeIf(review -> review.getFilmeId().equals(filmeId));
+    }
 }

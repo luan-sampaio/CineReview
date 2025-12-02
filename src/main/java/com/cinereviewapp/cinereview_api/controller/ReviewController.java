@@ -34,11 +34,22 @@ public class ReviewController {
 
     @GetMapping("/filmes/{filmeId}/reviews")
     public ResponseEntity<List<Review>> listarReviewsDoFilme(@PathVariable String filmeId) {
-        if (filmeService.getFilmePorId(filmeId) == null) {
-            return ResponseEntity.notFound().build();
+        // CORREÇÃO: Usar .isEmpty() ao invés de == null
+        if (filmeService.getFilmePorId(filmeId).isEmpty()) {
+            return ResponseEntity.notFound().build(); // Retorna 404 se o filme não existir
         }
 
         List<Review> reviewsDoFilme = reviewService.getReviewsPorFilmeId(filmeId);
         return ResponseEntity.ok(reviewsDoFilme);
+    }
+
+    @GetMapping("/reviews")
+    public ResponseEntity<List<Review>> listarReviewsPorTitulo(@RequestParam String titulo) {
+        List<Review> reviews = reviewService.getReviewsPorTituloFilme(titulo);
+
+        if (reviews.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(reviews);
     }
 }
