@@ -44,10 +44,9 @@ public class FilmeService {
         return filmeRepository.findByTitulo(titulo);
     }
 
-    public Filme updateFilme(String titulo, Filme filmeDetalhes) {
-        // Busca pelo titulo correto agora
-        Filme filme = filmeRepository.findByTitulo(titulo)
-                .orElseThrow(() -> new ResourceNotFoundException("Filme não encontrado com titulo " + titulo));
+    public Filme updateFilme(String id, Filme filmeDetalhes) {
+        Filme filme = filmeRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Filme não encontrado com id " + id));
 
         // Atualiza os dados
         filme.setTitulo(filmeDetalhes.getTitulo());
@@ -58,13 +57,10 @@ public class FilmeService {
         return filmeRepository.save(filme);
     }
 
-    // Testar
-    // Deletar um filme
-    // Deletar um filme pelo Título
-    public void deleteFilme(String titulo) {
+    public void deleteFilme(String id) {
         Filme filme;
-        filme = filmeRepository.findByTitulo(titulo)
-                .orElseThrow(() -> new ResourceNotFoundException("Filme não encontrado com titulo: " + titulo));
+        filme = filmeRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Filme não encontrado com titulo: " + id));
 
         filmeRepository.delete(filme);
     }
