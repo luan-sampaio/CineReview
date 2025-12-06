@@ -20,9 +20,14 @@ import com.cinereviewapp.cinereview_api.service.FilmeService;
 import com.cinereviewapp.cinereview_api.service.ReviewService;
 import com.cinereviewapp.cinereview_api.service.TmdbService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @RequestMapping("/api/filmes")
+@Tag(name = "Filmes", description = "Gerenciamento do catálogo de filmes (CRUD e Integração TMDB)")
 public class FilmeController {
     
     private FilmeService filmeService;
@@ -36,14 +41,19 @@ public class FilmeController {
         this.tmdbService = tmdbService;
     }
 
-    //GET /api/filmes
+    @Operation(summary = "Lista todos os filmes", description = "Retorna uma lista completa de filmes salvos no banco de dados local")
+    @ApiResponse(responseCode = "200", description = "Operação bem sucedida")
     @GetMapping
     public List<Filme> getFilmes() {
         return filmeService.getFilmes();
     }
     
 
-    // URL: GET /api/filmes/busca?titulo=
+    @Operation(summary = "Busca local por título", description = "Procura um filme no banco de dados local pelo nome exato")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Filme encontrado"),
+        @ApiResponse(responseCode = "404", description = "Filme não encontrado")
+    })
     @GetMapping("/busca") 
     public ResponseEntity<Filme> getFilmePorTitulo(@RequestParam("titulo") String titulo) {
         return filmeService.getFilmePorNome(titulo)
@@ -51,6 +61,11 @@ public class FilmeController {
                 .orElseThrow(() -> new ResourceNotFoundException("Filme não encontrado com título: " + titulo));
     }
 
+    @Operation(summary = "Busca local por ID", description = "Retorna os detalhes de um filme específico pelo seu ID")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Filme encontrado"),
+        @ApiResponse(responseCode = "404", description = "ID não encontrado")
+    })
     @GetMapping("/{id}")
     public ResponseEntity<Filme> getFilmePorId(@PathVariable String id) {
         Filme filme = filmeService.getFilmePorId(id)
@@ -58,7 +73,8 @@ public class FilmeController {
         return ResponseEntity.ok(filme);
     }
 
-    // GET /api/filmes/tmdb?titulo=
+    @Operation(summary = "Pesquisa no TMDB (Externo)", description = "Consulta a API do TMDB e retorna uma lista de possíveis filmes. Não salva no banco.")
+    @ApiResponse(responseCode = "200", description = "Busca realizada com sucesso")
     @GetMapping("/tmdb")
     public ResponseEntity<List<Filme>> buscarFilmesExternos(@RequestParam String titulo) {
         
@@ -68,13 +84,19 @@ public class FilmeController {
         return ResponseEntity.ok(filmes);
     }
 
+    @Operation(summary = "Adiciona filme manualmente", description = "Cria um novo filme passando todos os dados no corpo da requisição")
+    @ApiResponse(responseCode = "200", description = "Filme criado com sucesso")
     @PostMapping
     public Filme addFilme(@RequestBody Filme filme) {
         return filmeService.addFilme(filme);
     }
 
-    // POST /api/filmes/importar/550
-    // (550 é o ID do Clube da Luta no TMDB, por exemplo)
+    @Operation(summary = "Importa filme do TMDB", description = "Busca os detalhes completos no TMDB pelo ID e salva automaticamente no banco local")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Filme importado e salvo com sucesso"),
+        @ApiResponse(responseCode = "409", description = "O filme já existe no banco de dados"), // Documentando o seu Conflict
+        @ApiResponse(responseCode = "404", description = "ID não encontrado no TMDB")
+    })
     @PostMapping("/importar/{idTmdb}")
     public ResponseEntity<Filme> importarFilmeDoTmdb(@PathVariable String idTmdb) {
         
@@ -93,13 +115,22 @@ public class FilmeController {
         return ResponseEntity.ok(filmeSalvo);
     }
     
-    
+    @Operation(summary = "Atualiza um filme", description = "Atualiza os dados de um filme existente pelo ID")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Filme atualizado com sucesso"),
+        @ApiResponse(responseCode = "404", description = "Filme não encontrado para atualização")
+    })
     @PutMapping("/{id}")
     public ResponseEntity<Filme> updateFilme(@PathVariable String id, @RequestBody Filme filmeDetalhes) {
         Filme updatedFilme = filmeService.updateFilme(id, filmeDetalhes);
         return ResponseEntity.ok(updatedFilme);
     }
 
+    @Operation(summary = "Deleta um filme", description = "Remove um filme e todas as suas reviews associadas do banco de dados")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "204", description = "Filme deletado com sucesso (Sem conteúdo)"),
+        @ApiResponse(responseCode = "404", description = "Filme não encontrado")
+    })
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteFilme(@PathVariable String id) {
         var filmeOpt = filmeService.getFilmePorId(id);
