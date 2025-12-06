@@ -1,5 +1,6 @@
 package com.cinereviewapp.cinereview_api.model;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
@@ -10,6 +11,8 @@ public class Filme {
     @Id
     private String id;
     private String titulo;
+
+    @Column(columnDefinition = "TEXT")
     private String sinopse;
     private String dataLancamento;
     private Float notaMedia;
