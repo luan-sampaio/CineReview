@@ -18,6 +18,8 @@ import com.cinereviewapp.cinereview_api.exception.ResourceNotFoundException;
 import com.cinereviewapp.cinereview_api.model.Filme;
 import com.cinereviewapp.cinereview_api.service.FilmeService;
 import com.cinereviewapp.cinereview_api.service.ReviewService;
+import com.cinereviewapp.cinereview_api.service.TmdbService;
+
 
 @RestController
 @RequestMapping("/api/filmes")
@@ -25,11 +27,13 @@ public class FilmeController {
     
     private FilmeService filmeService;
     private ReviewService reviewService;
+    private TmdbService tmdbService;
 
     @Autowired
-    public FilmeController(FilmeService filmeService, ReviewService reviewService) {
+    public FilmeController(FilmeService filmeService, ReviewService reviewService, TmdbService tmdbService) {
         this.filmeService = filmeService;
         this.reviewService = reviewService;
+        this.tmdbService = tmdbService;
     }
 
     //GET /api/filmes
@@ -39,7 +43,7 @@ public class FilmeController {
     }
     
 
-    // URL: GET /api/filmes/busca?titulo=Matrix
+    // URL: GET /api/filmes/busca?titulo=
     @GetMapping("/busca") 
     public ResponseEntity<Filme> getFilmePorTitulo(@RequestParam("titulo") String titulo) {
         return filmeService.getFilmePorNome(titulo)
@@ -54,9 +58,39 @@ public class FilmeController {
         return ResponseEntity.ok(filme);
     }
 
+    // GET /api/filmes/tmdb?titulo=
+    @GetMapping("/tmdb")
+    public ResponseEntity<List<Filme>> buscarFilmesExternos(@RequestParam String titulo) {
+        
+        // Agora o serviço retorna uma LISTA de objetos Filme, não mais uma String
+        List<Filme> filmes = tmdbService.buscarFilmesPorTitulo(titulo);
+        
+        return ResponseEntity.ok(filmes);
+    }
+
     @PostMapping
     public Filme addFilme(@RequestBody Filme filme) {
         return filmeService.addFilme(filme);
+    }
+
+    // POST /api/filmes/importar/550
+    // (550 é o ID do Clube da Luta no TMDB, por exemplo)
+    @PostMapping("/importar/{idTmdb}")
+    public ResponseEntity<Filme> importarFilmeDoTmdb(@PathVariable String idTmdb) {
+        
+        if (filmeService.getFilmePorId(idTmdb).isPresent()) {
+            return ResponseEntity.status(409).build(); 
+        }
+
+        Filme filmeParaSalvar = tmdbService.buscarFilmePorId(idTmdb);
+
+        if (filmeParaSalvar == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        Filme filmeSalvo = filmeService.addFilme(filmeParaSalvar);
+
+        return ResponseEntity.ok(filmeSalvo);
     }
     
     
@@ -68,16 +102,13 @@ public class FilmeController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteFilme(@PathVariable String id) {
-        // Primeiro precisamos descobrir o ID desse filme antes de deletar
         var filmeOpt = filmeService.getFilmePorId(id);
 
         if (filmeOpt.isPresent()) {
             String filmeId = filmeOpt.get().getId();
 
-            // 1. Deleta as reviews da memória
             reviewService.deleteReviewsPorFilmeId(filmeId);
 
-            // 2. Deleta o filme do banco
             filmeService.deleteFilme(id);
 
             return ResponseEntity.noContent().build();

@@ -2,13 +2,19 @@ package com.cinereviewapp.cinereview_api.controller;
 
 import java.util.List;
 
-import com.cinereviewapp.cinereview_api.model.Review;
-import com.cinereviewapp.cinereview_api.service.FilmeService;
-import com.cinereviewapp.cinereview_api.service.ReviewService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.cinereviewapp.cinereview_api.model.Review;
+import com.cinereviewapp.cinereview_api.service.FilmeService;
+import com.cinereviewapp.cinereview_api.service.ReviewService;
 
 @RestController
 public class ReviewController {
@@ -34,7 +40,6 @@ public class ReviewController {
 
     @GetMapping("/filmes/{filmeId}/reviews")
     public ResponseEntity<List<Review>> listarReviewsDoFilme(@PathVariable String filmeId) {
-        // CORREÇÃO: Usar .isEmpty() ao invés de == null
         if (filmeService.getFilmePorId(filmeId).isEmpty()) {
             return ResponseEntity.notFound().build(); // Retorna 404 se o filme não existir
         }
