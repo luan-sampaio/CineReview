@@ -2,59 +2,62 @@ package com.cinereviewapp.cinereview_api.controller;
 
 import java.util.List;
 
+import com.cinereviewapp.cinereview_api.model.Review;
+import com.cinereviewapp.cinereview_api.service.ReviewService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
-import com.cinereviewapp.cinereview_api.model.Review;
-import com.cinereviewapp.cinereview_api.service.FilmeService;
-import com.cinereviewapp.cinereview_api.service.ReviewService;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
+@RequestMapping("/api/reviews") // Padronização da URL Base
 public class ReviewController {
 
     @Autowired
     private ReviewService reviewService;
-    @PostMapping("/filmes/{filmeId}/reviews")
-    public ResponseEntity<String> addReviewParaFilme(
-            @PathVariable String filmeId,
-            @RequestBody Review review
+
+    // 1. POST: Adicionar Review
+    // URL: http://localhost:8080/api/reviews
+    @PostMapping
+    public ResponseEntity<Review> addReview(@RequestBody Review review) {
+        Review novaReview = reviewService.addReview(review);
+        return new ResponseEntity<>(novaReview, HttpStatus.CREATED);
+    }
+
+    // 2. GET: Listar Reviews (Aceita filtro por ID ou Título)
+    // URL 1: http://localhost:8080/api/reviews?filmeId={UUID}
+    // URL 2: http://localhost:8080/api/reviews?titulo=Matrix
+    @GetMapping
+    public ResponseEntity<List<Review>> listarReviews(
+            @RequestParam(required = false) String filmeId,
+            @RequestParam(required = false) String titulo
     ) {
-        boolean sucesso = reviewService.addReview(filmeId, review);
+        List<Review> resultado;
 
-        if (sucesso) {
-            return new ResponseEntity<>("Review adicionada com sucesso!", HttpStatus.CREATED);
+        if (filmeId != null) {
+            resultado = reviewService.getReviewsPorFilmeId(filmeId);
+        } else if (titulo != null) {
+            resultado = reviewService.getReviewsPorTituloFilme(titulo);
         } else {
-            return new ResponseEntity<>("Filme com ID " + filmeId + " não encontrado.", HttpStatus.NOT_FOUND);
-        }
-    }
-
-    @Autowired
-    private FilmeService filmeService;
-
-    @GetMapping("/filmes/{filmeId}/reviews")
-    public ResponseEntity<List<Review>> listarReviewsDoFilme(@PathVariable String filmeId) {
-        if (filmeService.getFilmePorId(filmeId).isEmpty()) {
-            return ResponseEntity.notFound().build(); // Retorna 404 se o filme não existir
+            // Se não passar parâmetros, retorna vazio ou todas (opcional)
+            return ResponseEntity.ok(List.of());
         }
 
-        List<Review> reviewsDoFilme = reviewService.getReviewsPorFilmeId(filmeId);
-        return ResponseEntity.ok(reviewsDoFilme);
-    }
-
-    @GetMapping("/reviews")
-    public ResponseEntity<List<Review>> listarReviewsPorTitulo(@RequestParam String titulo) {
-        List<Review> reviews = reviewService.getReviewsPorTituloFilme(titulo);
-
-        if (reviews.isEmpty()) {
+        if (resultado.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.ok(reviews);
+
+        return ResponseEntity.ok(resultado);
+    }
+
+    @DeleteMapping("/{reviewId}")
+    public ResponseEntity<Void> deletarReview(@PathVariable String reviewId) {
+
+        boolean removido = reviewService.deleteReviewPorId(reviewId);
+
+        if (removido) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.notFound().build();
     }
 }

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import com.cinereviewapp.cinereview_api.exception.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 
 import com.cinereviewapp.cinereview_api.model.Filme;
@@ -12,6 +13,7 @@ import com.cinereviewapp.cinereview_api.model.Review;
 @Service
 public class ReviewService {
 
+    // Simulando banco em memória
     public List<Review> reviews = new ArrayList<>();
 
     private final FilmeService filmeService;
@@ -20,40 +22,45 @@ public class ReviewService {
         this.filmeService = filmeService;
     }
 
-    public boolean addReview(String filmeId, Review review) {
-        Optional<Filme> filmeExistente = filmeService.getFilmePorId(filmeId);
+    // ADICIONAR
+    public Review addReview(Review review) {
+        Optional<Filme> filme = filmeService.getFilmePorId(review.getFilmeId());
 
-        if (filmeExistente != null) {
-            review.setFilmeId(filmeId);
-
+        if (filme.isPresent()) {
+            // O ID já é gerado no construtor da classe Review ou aqui se preferir
+            // review.setId(UUID.randomUUID().toString());
             reviews.add(review);
-            return true;
+            return review;
         } else {
-            return false;
+            throw new ResourceNotFoundException("Filme não encontrado.");
         }
     }
 
+    // LISTAR POR FILME
     public List<Review> getReviewsPorFilmeId(String filmeId) {
         return reviews.stream()
-                .filter(review -> review.getFilmeId().equals(filmeId))
+                .filter(r -> r.getFilmeId().equals(filmeId))
                 .toList();
     }
 
-
-    public List<Review> getReviewsPorTituloFilme(String tituloFilme) {
-        Optional<Filme> filme = filmeService.getFilmePorNome(tituloFilme);
-
+    // LISTAR POR TÍTULO
+    public List<Review> getReviewsPorTituloFilme(String titulo) {
+        Optional<Filme> filme = filmeService.getFilmePorNome(titulo);
         if (filme.isPresent()) {
-            String idDoFilme = filme.get().getId();
-            return getReviewsPorFilmeId(idDoFilme);
-        } else {
-            return List.of();
+            return getReviewsPorFilmeId(filme.get().getId());
         }
-    }
-    // Remove todas as reviews associadas a um ID de filme
-    public void deleteReviewsPorFilmeId(String filmeId) {
-        reviews.removeIf(review -> review.getFilmeId().equals(filmeId));
+        return List.of();
     }
 
-    
+    // --- NOVA LÓGICA DE DELEÇÃO ---
+
+    // Deletar UMA review específica (Pelo ID da Review)
+    public boolean deleteReviewPorId(String reviewId) {
+        return reviews.removeIf(r -> r.getId().equals(reviewId));
+    }
+
+    // Limpeza (Cascata): Deletar todas as reviews de um filme que foi apagado
+    public void deleteReviewsPorFilmeId(String filmeId) {
+        reviews.removeIf(r -> r.getFilmeId().equals(filmeId));
+    }
 }
