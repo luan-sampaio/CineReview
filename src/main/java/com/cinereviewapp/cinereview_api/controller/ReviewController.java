@@ -8,9 +8,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @RequestMapping("/api/reviews") // Padronização da URL Base
+@Tag(name = "Reviews", description = "Endpoints para gerenciamento de críticas e avaliações")
 public class ReviewController {
 
     @Autowired
@@ -18,7 +21,9 @@ public class ReviewController {
 
     // 1. POST: Adicionar Review
     // URL: http://localhost:8080/api/reviews
+
     @PostMapping
+    @Operation(summary = "Criar nova review", description = "Adiciona uma crítica a um filme existente. Requer o ID do filme.")
     public ResponseEntity<Review> addReview(@RequestBody Review review) {
         Review novaReview = reviewService.addReview(review);
         return new ResponseEntity<>(novaReview, HttpStatus.CREATED);
@@ -28,6 +33,7 @@ public class ReviewController {
     // URL 1: http://localhost:8080/api/reviews?filmeId={UUID}
     // URL 2: http://localhost:8080/api/reviews?titulo=Matrix
     @GetMapping
+    @Operation(summary = "Listar reviews", description = "Busca reviews filtrando por ID do filme ou Título do filme.")
     public ResponseEntity<List<Review>> listarReviews(
             @RequestParam(required = false) String filmeId,
             @RequestParam(required = false) String titulo
@@ -51,6 +57,7 @@ public class ReviewController {
     }
 
     @DeleteMapping("/{reviewId}")
+    @Operation(summary = "Deletar review", description = "Remove uma crítica específica do sistema baseada no ID da review.")
     public ResponseEntity<Void> deletarReview(@PathVariable String reviewId) {
 
         boolean removido = reviewService.deleteReviewPorId(reviewId);
