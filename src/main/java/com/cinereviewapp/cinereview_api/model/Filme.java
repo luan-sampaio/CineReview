@@ -47,45 +47,16 @@ public class Filme {
     };
 
     // Getters e Setters
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getTitulo() {
-        return titulo;
-    }
-
-    public void setTitulo(String titulo) {
-        this.titulo = titulo;
-    }
-
-    public String getSinopse() {
-        return sinopse;
-    }
-
-    public void setSinopse(String sinopse) {
-        this.sinopse = sinopse;
-    }
-
-    public String getDataLancamento() {
-        return dataLancamento;
-    }
-
-    public void setDataLancamento(String dataLancamento) {
-        this.dataLancamento = dataLancamento;
-    }
-
-    public Float getNotaMedia() {
-        return notaMedia;
-    }
-
-    public void setNotaMedia(Float notaMedia) {
-        this.notaMedia = notaMedia;
-    }
+    public String getId() { return id; }
+    public void setId(String id) { this.id = id; }
+    public String getTitulo() { return titulo; }
+    public void setTitulo(String titulo) { this.titulo = titulo; }
+    public String getSinopse() { return sinopse; }
+    public void setSinopse(String sinopse) { this.sinopse = sinopse; }
+    public String getDataLancamento() { return dataLancamento; }
+    public void setDataLancamento(String dataLancamento) { this.dataLancamento = dataLancamento; }
+    public Float getNotaMedia() { return notaMedia;}
+    public void setNotaMedia(Float notaMedia) { this.notaMedia = notaMedia;}
 
     // Formato
     @Override

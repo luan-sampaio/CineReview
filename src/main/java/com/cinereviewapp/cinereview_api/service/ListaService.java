@@ -1,14 +1,16 @@
 package com.cinereviewapp.cinereview_api.service;
 
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.cinereviewapp.cinereview_api.exception.ResourceNotFoundException;
 import com.cinereviewapp.cinereview_api.model.Filme;
 import com.cinereviewapp.cinereview_api.model.Lista;
 import com.cinereviewapp.cinereview_api.repository.ListaRepository;
-import com.cinereviewapp.cinereview_api.exception.ResourceNotFoundException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import jakarta.transaction.Transactional;
 
-import java.util.List;
+import jakarta.transaction.Transactional;
 
 @Service
 public class ListaService {
@@ -28,6 +30,15 @@ public class ListaService {
         return listaRepository.findAll();
     }
 
+    /**
+     * Adiciona um filme existente a uma lista de favoritos.
+     * <p>
+     * Realiza a validação de existência tanto da Lista quanto do Filme antes de fazer a associação.
+     * * @param listaId O ID da lista onde o filme será adicionado.
+     * @param filmeId O ID do filme a ser inserido.
+     * @return A lista atualizada contendo o novo filme.
+     * @throws ResourceNotFoundException caso a lista ou o filme não sejam encontrados.
+     */
     public Lista addFilmeToLista(Long listaId, String filmeId) {
         // 1. Busca a lista
         Lista lista = listaRepository.findById(listaId)
@@ -42,16 +53,24 @@ public class ListaService {
         return listaRepository.save(lista);
     }
 
+    /**
+     * Remove um filme específico de uma lista.
+     * <p>
+     * A anotação {@code @Transactional} garante que a operação de leitura, remoção e salvamento
+     * ocorra de forma atômica no banco de dados.
+     * * @param listaId O ID da lista.
+     * @param filmeId O ID do filme a ser removido.
+     * @return A lista atualizada após a remoção.
+     * @throws ResourceNotFoundException se a lista não existir ou se o filme não estiver nela.
+     */
     public void deleteLista(Long id) {
         listaRepository.deleteById(id);
     }
     @Transactional // Garante que a remoção e o salvamento ocorram na mesma transação
     public Lista removeFilmeFromLista(Long listaId, String filmeId) {
-        // 1. Busca a lista
         Lista lista = listaRepository.findById(listaId)
                 .orElseThrow(() -> new ResourceNotFoundException("Lista não encontrada com ID: " + listaId));
 
-        // 2. Remove o filme da lista se o ID bater
         // O removeIf retorna 'true' se algo foi removido
         boolean removed = lista.getFilmes().removeIf(filme -> filme.getId().equals(filmeId));
 
@@ -59,7 +78,6 @@ public class ListaService {
             throw new ResourceNotFoundException("Filme com ID " + filmeId + " não encontrado nesta lista.");
         }
 
-        // 3. Salva a lista atualizada
         return listaRepository.save(lista);
     }
 }
